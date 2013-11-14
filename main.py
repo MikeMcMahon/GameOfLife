@@ -32,7 +32,6 @@ def main():
     citizen_size = (10, 10)
 
     game_sprites = [Citizen(0, 0, *citizen_size) for x in xrange(rows * cols)]
-#    game_grid = [[0 for x in xrange(rows)] for x in xrange(cols)]
 
     sprite_renderer = pygame.sprite.RenderPlain(game_sprites)
 
