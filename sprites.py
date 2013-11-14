@@ -9,22 +9,22 @@ from colors import *
 class GameBase(Sprite):
     def __init__(self):
         Sprite.__init__(self)
-        self.rect = self._x, self._y, self._width, self._width = 0, 0, 0, 0
+        self.rect = self._x, self._y, self._width, self._height = 0, 0, 0, 0
         self.pos = self._x, self._y
         self.name = None
-        self.neighbors = ()
 
     def get_pos(self):
         return self.pos
 
-    def set_pos(self, point):
+    def set_pos(self, *point):
         self.pos = self._x, self._y = point
+        self.rect = self._x, self._y, self._width, self._height
 
     def get_rect(self):
         return self.rect
 
     def set_rect(self, x, y, width, height):
-        self.rect = self._x, self._y, self._width, self._width = x, y, width, height
+        self.rect = self._x, self._y, self._width, self._height = x, y, width, height
 
 
 class Citizen(GameBase):
@@ -39,6 +39,22 @@ class Citizen(GameBase):
         self.is_highlighted = False
         self.next_state = -1
         self._fill_color()
+        self._neighbors = list()
+
+    def add_neighbor(self, neighbor):
+        if neighbor not in self._neighbors:
+            self._neighbors.append(neighbor)
+
+    def living_neighbors(self):
+        """
+        returns the count of neighbors that are alive
+        """
+        count = 0
+        for neighbor in self._neighbors:
+            if neighbor.citizen_alive():
+                count += 1
+
+        return count
 
     def highlight(self):
         self.is_highlighted = True
