@@ -6,6 +6,9 @@ created: 11/13/13
 """
 import sys
 import pygame
+
+from pygame.locals import *
+
 from colors import WHITE, BLACK
 from physics import collision_detection
 from sprites import Citizen
@@ -44,9 +47,9 @@ def main():
     while True:
         # HANDLES THE INPUT
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == QUIT:
                 sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == MOUSEBUTTONDOWN:
                 mouse_loc = pygame.mouse.get_pos()
                 if collision_detection(start_loc, mouse_loc):
                     start = font_renderer.render("Pause" if is_paused else "Start", 1, BLACK)
