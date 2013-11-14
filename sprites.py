@@ -1,7 +1,7 @@
 __author__ = 'Mike Mcmahon'
 
 import pygame
-from Color import *
+from colors import *
 
 
 class GameBase(object):

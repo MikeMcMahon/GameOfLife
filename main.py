@@ -6,44 +6,9 @@ created: 11/13/13
 """
 import sys
 import pygame
-from Color import WHITE, BLACK
+from colors import WHITE, BLACK
+from physics import collision_detection
 from sprites import Citizen
-
-
-def collision_detection(rect, point):
-    """
-        Does a single point lay within the given rectangle
-    """
-    x, y, w, h = rect
-    x2, y2 = point
- 
-    if x <= x2 <= x + w:
-        if y <= y2 <= y + h:
-            return True
- 
-    return False
- 
- 
-def collision_detection_rect(rect1, rect2):
-    """
-    If the second rectangle lands anywhere on top of the first rectangle
-    """
-    x, y, w, h = rect2
-    ul = x, y
-    ur = x+w, y
-    bl = x, y+h
-    br = x+w, y+h
- 
-    if collision_detection(rect1, ul):
-        return True
-    if collision_detection(rect1, ur):
-        return True
-    if collision_detection(rect1, bl):
-        return True
-    if collision_detection(rect1, br):
-        return True
- 
-    return False
 
 
 def main():
@@ -73,7 +38,7 @@ def main():
         run_y += 11
 
     game_ticks = pygame.time.get_ticks()
-    game_ticks_ellapsed = 0
+    game_ticks_elapsed = 0
     game_ticks_fps = 120
 
     while True:
@@ -112,8 +77,8 @@ def main():
                     else:
                         game_grid[row][col].clear_highlight()
 
-        if game_ticks_ellapsed - game_ticks >= game_ticks_fps:
-            game_ticks = game_ticks_ellapsed
+        if game_ticks_elapsed - game_ticks >= game_ticks_fps:
+            game_ticks = game_ticks_elapsed
 
             if not is_paused:
                 # GAME LOGIC GOES HERE
@@ -155,7 +120,7 @@ def main():
             clear_loc = screen.blit(clear, (screen.get_width() - clear.get_width() - 5,  5))
 
         else:
-            game_ticks_ellapsed = pygame.time.get_ticks()
+            game_ticks_elapsed = pygame.time.get_ticks()
 
         for row in range(rows):
             for col in range(cols):
