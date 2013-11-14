@@ -11,7 +11,7 @@ from pygame.locals import *
 
 from colors import WHITE, BLACK
 from physics import collision_detection
-from sprites import Citizen
+from sprites import Cell
 
 
 def main():
@@ -29,9 +29,9 @@ def main():
     is_paused = True
 
     cols, rows = 10, 10
-    citizen_size = (10, 10)
+    cell_size = (10, 10)
 
-    game_sprites = [Citizen(0, 0, *citizen_size) for x in xrange(rows * cols)]
+    game_sprites = [Cell(0, 0, *cell_size) for x in xrange(rows * cols)]
 
     sprite_renderer = pygame.sprite.RenderPlain(game_sprites)
 
@@ -85,7 +85,7 @@ def main():
                     # If the game is paused and we hover over the game piece???
                     for sprite in sprite_renderer.sprites():
                         if collision_detection(sprite.get_rect(), mouse_loc):
-                            sprite.kill() if sprite.citizen_alive() else sprite.resurrect()
+                            sprite.kill() if sprite.is_cell_alive() else sprite.resurrect()
 
                     sprite_renderer.update(True, False, True)
 
