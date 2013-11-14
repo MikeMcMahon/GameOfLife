@@ -1,78 +1,85 @@
+from pygame.sprite import Sprite
+
 __author__ = 'Mike Mcmahon'
 
 import pygame
 from colors import *
 
 
-class GameBase(object):
+class GameBase(Sprite):
     def __init__(self):
-        self._rect = self._x, self._y, self._width, self._width = 0, 0, 0, 0
-        self._pos = self._x, self._y
+        Sprite.__init__(self)
+        self.rect = self._x, self._y, self._width, self._width = 0, 0, 0, 0
+        self.pos = self._x, self._y
+        self.name = None
+        self.neighbors = ()
 
     def get_pos(self):
-        return self._pos
+        return self.pos
 
     def set_pos(self, point):
-        self._pos = self._x, self._y = point
+        self.pos = self._x, self._y = point
 
     def get_rect(self):
-        return self._rect
+        return self.rect
 
     def set_rect(self, x, y, width, height):
-        self._rect = self._x, self._y, self._width, self._width = x, y, width, height
+        self.rect = self._x, self._y, self._width, self._width = x, y, width, height
 
 
 class Citizen(GameBase):
     def __init__(self, x, y, width, height):
+        GameBase.__init__(self)
         self.set_rect(x, y, width, height)
-        self._surface = pygame.Surface((width, height), pygame.SRCALPHA)
-        self._alive_color = GREY
-        self._dead_color = WHITE
-        self._highlight_color = RED
-        self._is_alive = False
-        self._is_highlighted = False
-        self._next_state = -1
+        self.image = pygame.Surface((width, height), pygame.SRCALPHA)
+        self.alive_color = GREY
+        self.dead_color = WHITE
+        self.highlight_color = RED
+        self.citizen_health = False
+        self.is_highlighted = False
+        self.next_state = -1
+        self._fill_color()
 
     def highlight(self):
-        self._is_highlighted = True
+        self.is_highlighted = True
 
     def clear_highlight(self):
-        self._is_highlighted = False
+        self.is_highlighted = False
 
     def kill_next_generation(self):
         """
         The next time generate() is called we will kill this citizen
         @return:
         """
-        self._next_state = 0
+        self.next_state = 0
 
     def resurrect_next_generation(self):
         """
         THe next time generate() is called we will ressurect this citizen
         @return:
         """
-        self._next_state = 1
+        self.next_state = 1
 
     def will_die(self):
         """
         Checks if the next call to generate() will kill this citizen
         @return:
         """
-        return True if self._next_state == 0 else False
+        return True if self.next_state == 0 else False
 
     def will_resurrect(self):
         """
         Checks if the next call to generate() will resurrect this citizen
         @return:
         """
-        return True if self._next_state == 1 else False
+        return True if self.next_state == 1 else False
 
     def kill(self):
         """
         Kills this citizen
         @return:
         """
-        self._is_alive = False
+        self.citizen_health = False
         pass
 
     def resurrect(self):
@@ -80,28 +87,37 @@ class Citizen(GameBase):
         By the grace of the neighbor we are brought back to life!
         @return:
         """
-        self._is_alive = True
+        self.citizen_health = True
 
-    def is_alive(self):
-        return self._is_alive
+    def citizen_alive(self):
+        """
+        Gets the health of the citizen
+        @return:
+        True = Alive
+        False = Dead
+        """
+        return self.citizen_health
+
+    def update(self, *args):
+        self._fill_color()
 
     def _fill_color(self):
         """
         Applies the specified color to the sprite
         """
-        self._surface.fill(GREY)
+        self.image.fill(GREY)
 
-        if self._is_alive:
-            self._surface.fill(self._alive_color, (1, 1, 8, 8))
-        elif self._is_highlighted:
-            self._surface.fill(self._highlight_color, (1, 1, 8, 8))
+        if self.citizen_health:
+            self.image.fill(self.alive_color, (1, 1, 8, 8))
+        elif self.is_highlighted:
+            self.image.fill(self.highlight_color, (1, 1, 8, 8))
         else:
-            self._surface.fill(self._dead_color, (1, 1, 8, 8))
+            self.image.fill(self.dead_color, (1, 1, 8, 8))
 
     def set_color(self, alive, dead, highlight):
-        self._alive_color = alive
-        self._dead_color = dead
-        self._highlight_color = highlight
+        self.alive_color = alive
+        self.dead_color = dead
+        self.highlight_color = highlight
 
     def generate(self):
         """
@@ -111,12 +127,4 @@ class Citizen(GameBase):
         self.kill() if self.will_die() else self.resurrect() if self.will_resurrect() else None
 
         # Reset the next state
-        self._next_state = -1
-
-    def blit_to(self, surface):
-        """
-        Blits to the surface and sets the rect to whatever is blit on that surface
-        @param surface:
-        """
-        self._fill_color()
-        self._rect = surface.blit(self._surface, (self._x, self._y))
+        self.next_state = -1
