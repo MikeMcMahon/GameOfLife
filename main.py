@@ -30,13 +30,17 @@ def main():
 
     cols, rows = 17, 17
     citizen_size = (10, 10)
-    game_grid = [[None for x in xrange(rows)] for x in xrange(cols)]  # ten by ten grid of 10 pixel blocks
+    game_grid = [[0 for x in xrange(rows)] for x in xrange(cols)]
+
+    sprite_renderer = pygame.sprite.RenderPlain()
 
     run_y = 20
     for row in range(rows):
         run_x = (screen.get_width() / 2) - ((cols * 13) / 2)
         for col in range(cols):
-            game_grid[row][col] = Citizen(run_x, run_y, *citizen_size)
+            sprite = Citizen(run_x, run_y, *citizen_size)
+            sprite_renderer.add(sprite)
+            game_grid[row][col] = sprite
             run_x += 11
         run_y += 11
 
@@ -58,27 +62,26 @@ def main():
                 if is_paused:
                     # Clears out the game board
                     if collision_detection(clear_loc, mouse_loc):
-                        for row in range(rows):
-                            for col in range(cols):
-                                game_grid[row][col].kill()
-                                #game_grid[row][col].is_highlighted = False
+                        for sprite in sprite_renderer.sprites():
+                            sprite.kill()
+                            sprite.update()
 
                     # If the game is paused and we hover over the game piece???
-                    for row in range(rows):
-                        for col in range(cols):
-                            if collision_detection(game_grid[row][col].get_rect(), mouse_loc):
-                                game_grid[row][col].kill() \
-                                    if game_grid[row][col].is_alive() else game_grid[row][col].resurrect()
+                    for sprite in sprite_renderer.sprites():
+                        if collision_detection(sprite.get_rect(), mouse_loc):
+                            sprite.kill() if sprite.citizen_alive() else sprite.resurrect()
+                            sprite.update()
 
         if is_paused:
             mouse_loc = pygame.mouse.get_pos()
             # Check for any collisions
-            for row in range(rows):
-                for col in range(cols):
-                    if collision_detection(game_grid[row][col].get_rect(), mouse_loc):
-                        game_grid[row][col].highlight()
-                    else:
-                        game_grid[row][col].clear_highlight()
+            for sprite in sprite_renderer.sprites():
+                if collision_detection(sprite.get_rect(), mouse_loc):
+                    sprite.highlight()
+                else:
+                    sprite.clear_highlight()
+
+                sprite.update()
 
         if game_ticks_elapsed - game_ticks >= game_ticks_fps:
             game_ticks = game_ticks_elapsed
@@ -103,32 +106,37 @@ def main():
                         alive_neighbors = 0
                         for neighbor in neighbors:
                             if 0 <= neighbor[0] < rows and 0 <= neighbor[1] < cols:
-                                if game_grid[neighbor[0]][neighbor[1]].is_alive():
+                                if game_grid[neighbor[0]][neighbor[1]].citizen_alive():
                                     alive_neighbors += 1
-                        if game_grid[row][col].is_alive():
+                        if game_grid[row][col].citizen_alive():
                             if alive_neighbors < 2:
                                 game_grid[row][col].kill_next_generation()
+                                game_grid[row][col].update()
                             if 2 <= alive_neighbors <= 3:
                                 # Keep alive
                                 pass
                             if alive_neighbors > 3:
                                 game_grid[row][col].kill_next_generation()
+                                game_grid[row][col].update()
                         else:
                             if alive_neighbors == 3:
                                 game_grid[row][col].resurrect_next_generation()
+                                game_grid[row][col].update()
 
-            # RENDER LOGIC GOES PAST THIS POINT
-            screen.fill(WHITE)
-            start_loc = screen.blit(start, (5, 5))
-            clear_loc = screen.blit(clear, (screen.get_width() - clear.get_width() - 5,  5))
+                for row in range(rows):
+                    for col in range(cols):
+                        game_grid[row][col].generate()
 
         else:
             game_ticks_elapsed = pygame.time.get_ticks()
 
-        for row in range(rows):
-            for col in range(cols):
-                game_grid[row][col].generate()
-                game_grid[row][col].blit_to(screen)
+        # RENDER LOGIC GOES PAST THIS POINT
+        screen.fill(WHITE)
+        start_loc = screen.blit(start, (5, 5))
+        clear_loc = screen.blit(clear, (screen.get_width() - clear.get_width() - 5,  5))
+
+        sprite_renderer.draw(screen)
+
         pygame.display.flip()
 
 pygame.init()
