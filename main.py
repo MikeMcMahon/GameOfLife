@@ -81,13 +81,13 @@ def main():
                     if collision_detection(clear_loc, mouse_loc):
                         for sprite in sprite_renderer.sprites():
                             sprite.kill()
-                            sprite.update()
 
                     # If the game is paused and we hover over the game piece???
                     for sprite in sprite_renderer.sprites():
                         if collision_detection(sprite.get_rect(), mouse_loc):
                             sprite.kill() if sprite.citizen_alive() else sprite.resurrect()
-                            sprite.update()
+
+                    sprite_renderer.update(True, False, True)
 
         if is_paused:
             mouse_loc = pygame.mouse.get_pos()
@@ -98,36 +98,13 @@ def main():
                 else:
                     sprite.clear_highlight()
 
-                sprite.update()
+            sprite_renderer.update(True, False, True)
 
-        if game_ticks_elapsed - game_ticks >= game_ticks_fps:
+        if game_ticks_elapsed - game_ticks >= game_ticks_fps and not is_paused:
             game_ticks = game_ticks_elapsed
 
-            if not is_paused:
-                # GAME LOGIC GOES HERE
-                # Conways game of life rules
-                # 1) Any live cell with fewer than two live neighbors dies (under-population)
-                # 2) Any live cell with two or three live neighbors lives on to the next generation
-                # 3) Any live cell with more than three live neighbors dies as if by overcrowding
-                # 4) Any dead cell with exactly three live neighbors becomes a live cell as if by reproduction
-
-                for game_sprite in game_sprites:
-                    living = game_sprite.living_neighbors()
-                    if game_sprite.citizen_alive():
-                        if living < 2:
-                            game_sprite.kill_next_generation()
-                        if 2 <= living <= 3:
-                            # Keep alive
-                            pass
-                        if living > 3:
-                            game_sprite.kill_next_generation()
-                    else:
-                        if living == 3:
-                            game_sprite.resurrect_next_generation()
-
-                for game_sprite in game_sprites:
-                    game_sprite.update()
-                    game_sprite.generate()
+            sprite_renderer.update(False, False, False)
+            sprite_renderer.update(False, True, True)
 
         else:
             game_ticks_elapsed = pygame.time.get_ticks()
@@ -137,7 +114,6 @@ def main():
         start_loc = screen.blit(start, (5, 5))
         clear_loc = screen.blit(clear, (screen.get_width() - clear.get_width() - 5,  5))
 
-        #sprite_renderer.update()
         sprite_renderer.draw(screen)
 
         pygame.display.flip()

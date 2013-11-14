@@ -115,7 +115,28 @@ class Citizen(GameBase):
         return self.citizen_health
 
     def update(self, *args):
-        self._fill_color()
+        # Terrible and dirty way to do the update...whatevz
+        paused, do_generate, repaint = args
+
+        if not paused and not do_generate:
+            living = self.living_neighbors()
+            if self.citizen_alive():
+                if living < 2:
+                    self.kill_next_generation()
+                if 2 <= living <= 3:
+                    # Keep alive
+                    pass
+                if living > 3:
+                    self.kill_next_generation()
+            else:
+                if living == 3:
+                    self.resurrect_next_generation()
+
+        if do_generate:
+            self.generate()
+
+        if repaint:
+            self._fill_color()
 
     def _fill_color(self):
         """
