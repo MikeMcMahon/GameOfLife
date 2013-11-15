@@ -17,7 +17,7 @@ from sprites import Cell
 
 
 def main():
-    size = width, height = 320, 240
+    size = width, height = 320, 320
 
     screen = pygame.display.set_mode(size)
 
