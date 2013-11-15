@@ -4,6 +4,7 @@ author: Mike McMahon
 created: 11/13/13
  
 """
+from decimal import Decimal
 import sys
 import pygame
 
@@ -28,8 +29,9 @@ def main():
 
     is_paused = True
 
-    cols, rows = 10, 10
+    cols, rows = 25, 25
     cell_size = (10, 10)
+    cell_padding = 1
 
     game_sprites = [Cell(0, 0, *cell_size) for x in xrange(rows * cols)]
 
@@ -37,7 +39,7 @@ def main():
 
     run_y = 20
     for row in range(rows):
-        run_x = (screen.get_width() / 2) - ((cols * 13) / 2)
+        run_x = (Decimal(screen.get_width()) / Decimal(2)) - (Decimal(cols * (cell_size[0] + cell_padding)) / Decimal(2))
         for col in range(cols):
             index = (cols * row) + col
             neighbors = [
@@ -59,8 +61,8 @@ def main():
                     # Builds the graph of game sprites (or at least, what sprites we can navigate to from this one
                     game_sprites[index].add_neighbor(game_sprites[neighbor])
 
-            run_x += 11
-        run_y += 11
+            run_x += cell_size[0] + cell_padding
+        run_y += cell_size[1] + cell_padding
 
     game_ticks = pygame.time.get_ticks()
     game_ticks_elapsed = 0
