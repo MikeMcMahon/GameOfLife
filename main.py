@@ -5,6 +5,7 @@ created: 11/13/13
  
 """
 from decimal import Decimal
+import random
 import sys
 import pygame
 
@@ -26,6 +27,7 @@ def main():
 
     start = font_renderer.render("Start", 1, BLACK)
     clear = font_renderer.render("Clear", 1, BLACK)
+    random_seed = font_renderer.render("Random", 1, BLACK)
 
     is_paused = True
 
@@ -68,6 +70,10 @@ def main():
     game_ticks_elapsed = 0
     game_ticks_fps = 120
 
+    start_loc = (0, 0)
+    clear_loc = (0, 0)
+    random_loc = (0, 0)
+
     last_highlighted = Cell(0, 0, 0, 0)
     while True:
         # HANDLES THE INPUT
@@ -81,6 +87,13 @@ def main():
                     is_paused = not is_paused
 
                 if is_paused:
+                    if collision_detection(random_loc, mouse_loc):
+                        for sprite in sprite_renderer.sprites():
+                            if random.randint(0, 1) == 0:
+                                sprite.resurrect()
+                            else:
+                                sprite.kill()
+
                     # Clears out the game board
                     if collision_detection(clear_loc, mouse_loc):
                         for sprite in sprite_renderer.sprites():
@@ -124,6 +137,7 @@ def main():
         # RENDER LOGIC GOES PAST THIS POINT
         screen.fill(WHITE)
         start_loc = screen.blit(start, (5, 5))
+        random_loc = screen.blit(random_seed, ((screen.get_width() / 2) - (random_seed.get_width() / 2), 5))
         clear_loc = screen.blit(clear, (screen.get_width() - clear.get_width() - 5,  5))
 
         sprite_renderer.draw(screen)

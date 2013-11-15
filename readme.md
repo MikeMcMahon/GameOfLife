@@ -25,4 +25,4 @@ with the code and make any changes.  I do plan to add some more features/functio
 1. Step through generations
 1. Game grid size
 1. Better configuration settings (rendering speed mostly)
-1. Random pattern generation
+1. ~~Random pattern generation~~
