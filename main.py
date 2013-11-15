@@ -41,20 +41,21 @@ def main():
         for col in range(cols):
             index = (cols * row) + col
             neighbors = [
-                (((row-1) * cols) + col-1),
-                (((row-1) * cols) + col),
-                (((row-1) * cols) + col+1),
-                ((row * cols) + col-1),
-                ((row * cols) + col+1),
-                (((row+1) * cols) + col-1),
-                (((row+1) * cols) + col),
-                (((row+1) * cols) + col+1)
+                # The following ensures our bounds are within the visual graph
+                (((row-1) * cols) + col-1) if row - 1 >= 0 and col - 1 >= 0 else -1,
+                (((row-1) * cols) + col) if row - 1 >= 0 else -1,
+                (((row-1) * cols) + col+1) if row - 1 >= 0 and col + 1 < cols else -1,
+                ((row * cols) + col-1) if col - 1 >= 0 else -1,
+                ((row * cols) + col+1) if col + 1 < cols else -1,
+                (((row+1) * cols) + col-1) if row + 1 < rows and col - 1 >= 0 else -1,
+                (((row+1) * cols) + col) if row + 1 < rows else -1,
+                (((row+1) * cols) + col+1) if row + 1 < rows and col + 1 < cols else -1,
             ]
 
             game_sprites[index].set_pos(run_x, run_y)
 
             for neighbor in neighbors:
-                if len(game_sprites) > neighbor >= 0:
+                if neighbor >= 0:
                     # Builds the graph of game sprites (or at least, what sprites we can navigate to from this one
                     game_sprites[index].add_neighbor(game_sprites[neighbor])
 
@@ -65,6 +66,7 @@ def main():
     game_ticks_elapsed = 0
     game_ticks_fps = 120
 
+    last_highlighted = Cell(0, 0, 0, 0)
     while True:
         # HANDLES THE INPUT
         for event in pygame.event.get():
@@ -92,11 +94,19 @@ def main():
         if is_paused:
             mouse_loc = pygame.mouse.get_pos()
             # Check for any collisions
+
+            hit_none = True
             for sprite in sprite_renderer.sprites():
                 if collision_detection(sprite.get_rect(), mouse_loc):
+                    hit_none = False
+                    if not sprite == last_highlighted:
+                        last_highlighted.clear_highlight(True)
+                        last_highlighted = sprite
                     sprite.highlight()
                 else:
                     sprite.clear_highlight()
+            if hit_none:
+                last_highlighted.clear_highlight(True)
 
             sprite_renderer.update(True, False, True)
 

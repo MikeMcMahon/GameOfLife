@@ -35,6 +35,8 @@ class Cell(GameBase):
         self.alive_color = GREY
         self.dead_color = WHITE
         self.highlight_color = RED
+        self.neighbor_highlight = PINK
+        self.is_neighbor_highlighted = False
         self.cell_alive = False
         self.is_highlighted = False
         self.next_state = -1
@@ -57,9 +59,19 @@ class Cell(GameBase):
         return count
 
     def highlight(self):
+
+        for neighbor in self._neighbors:
+            neighbor.force_highlight = True
+            neighbor.is_neighbor_highlighted = True
+
         self.is_highlighted = True
 
-    def clear_highlight(self):
+    def clear_highlight(self, force=False):
+
+        if force:
+            for neighbor in self._neighbors:
+                neighbor.is_neighbor_highlighted = False
+
         self.is_highlighted = False
 
     def kill_next_generation(self):
@@ -148,6 +160,8 @@ class Cell(GameBase):
             self.image.fill(self.alive_color, (1, 1, 8, 8))
         elif self.is_highlighted:
             self.image.fill(self.highlight_color, (1, 1, 8, 8))
+        elif self.is_neighbor_highlighted:
+            self.image.fill(self.neighbor_highlight, (1, 1, 8, 8))
         else:
             self.image.fill(self.dead_color, (1, 1, 8, 8))
 
