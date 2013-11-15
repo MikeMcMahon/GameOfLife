@@ -59,15 +59,20 @@ class Cell(GameBase):
         return count
 
     def highlight(self):
-
+        """
+        Highlights the given cell and all surrounding neighbors
+        """
         for neighbor in self._neighbors:
-            neighbor.force_highlight = True
             neighbor.is_neighbor_highlighted = True
 
         self.is_highlighted = True
 
     def clear_highlight(self, force=False):
-
+        """
+        Clears the highlight on the cell
+        @param force:
+        True if we want to clear out the highlight for surrounding neighbors.
+        """
         if force:
             for neighbor in self._neighbors:
                 neighbor.is_neighbor_highlighted = False
