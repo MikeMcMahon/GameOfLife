@@ -11,7 +11,7 @@ import pygame
 
 from pygame.locals import *
 
-from colors import WHITE, BLACK
+from colors import *
 from physics import collision_detection
 from sprites import Cell
 
@@ -19,7 +19,7 @@ from sprites import Cell
 def main():
     size = width, height = 320, 320
 
-    screen = pygame.display.set_mode(size)
+    screen = pygame.display.set_mode(size, NOFRAME)
 
     pygame.font.init()
     default_font = pygame.font.get_default_font()
@@ -135,7 +135,7 @@ def main():
             game_ticks_elapsed = pygame.time.get_ticks()
 
         # RENDER LOGIC GOES PAST THIS POINT
-        screen.fill(WHITE)
+        fill_gradient(screen, WHITE, GREY)
         start_loc = screen.blit(start, (5, 5))
         random_loc = screen.blit(random_seed, ((screen.get_width() / 2) - (random_seed.get_width() / 2), 5))
         clear_loc = screen.blit(clear, (screen.get_width() - clear.get_width() - 5,  5))
