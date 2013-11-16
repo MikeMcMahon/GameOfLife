@@ -29,4 +29,4 @@ with the code and make any changes.  I do plan to add some more features/functio
 
 
 ## Bundled with
-[Glyphicons.com](GLYPHICONS.com) - [CC BY](http://creativecommons.org/licenses/by/3.0/)
+[Glyphicons.com](http://www.GLYPHICONS.com) - [CC BY](http://creativecommons.org/licenses/by/3.0/)
