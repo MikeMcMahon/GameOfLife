@@ -102,6 +102,8 @@ def main():
                 sys.exit()
             if event.type == MOUSEBUTTONDOWN:
                 pressed = pygame.mouse.get_pressed()
+                if pressed[0] == 0:
+                    continue
                 mouse_loc = pygame.mouse.get_pos()
                 if collision_detection(start.get_rect(), mouse_loc):
                     args = ("Pause", "glyphicons_174_pause.png") if is_paused else ("Start", "glyphicons_173_play.png")
@@ -157,10 +159,6 @@ def main():
 
         # RENDER LOGIC GOES PAST THIS POINT
         fill_gradient(screen, WHITE, GREY)
-        #start_loc = font.blit_font(start, screen, (5, 5))
-        #random_loc = screen.blit(random_seed, ((screen.get_width() / 2) - (random_seed.get_width() / 2), 5))
-        #clear_loc = screen.blit(clear, (screen.get_width() - clear.get_width() - 5,  5))
-
         font_sprite_renderer.update()
         font_sprite_renderer.draw(screen)
         sprite_renderer.draw(screen)
