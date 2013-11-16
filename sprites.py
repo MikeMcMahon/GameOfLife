@@ -1,30 +1,36 @@
+import os
+from pygame.rect import Rect
 from pygame.sprite import Sprite
+import colors
 
 __author__ = 'Mike Mcmahon'
 
 import pygame
+import font
 from colors import *
 
 
 class GameBase(Sprite):
     def __init__(self):
         Sprite.__init__(self)
-        self.rect = self._x, self._y, self._width, self._height = 0, 0, 0, 0
+        self._x, self._y, self._width, self._height = 0, 0, 0, 0
+        self.rect = Rect(self._x, self._y, self._width, self._height)
+        self.image = None
         self.pos = self._x, self._y
-        self.name = None
 
     def get_pos(self):
         return self.pos
 
     def set_pos(self, *point):
         self.pos = self._x, self._y = point
-        self.rect = self._x, self._y, self._width, self._height
+        self.set_rect(self._x, self._y, self._width, self._height)
 
     def get_rect(self):
         return self.rect
 
     def set_rect(self, x, y, width, height):
-        self.rect = self._x, self._y, self._width, self._height = x, y, width, height
+        self._x, self._y, self._width, self._height = x, y, width, height
+        self.rect = Rect(self._x, self._y, self._width, self._height)
 
 
 class Cell(GameBase):
@@ -35,7 +41,7 @@ class Cell(GameBase):
         self.alive_color = GREY
         self.dead_color = WHITE
         self.highlight_color = RED
-        self.neighbor_highlight = PINK
+        self.neighbor_highlight = YELLOW
         self.is_neighbor_highlighted = False
         self.cell_alive = False
         self.is_highlighted = False
@@ -184,3 +190,92 @@ class Cell(GameBase):
 
         # Reset the next state
         self.next_state = -1
+
+
+class GameFont(GameBase):
+
+    def __init__(self, font_renderer, label="", icon_path=""):
+        GameBase.__init__(self)
+        self.label = None
+        self.icon_path = None
+        self._show_icon = False
+        self.pos = self._x, self._y = 0, 0
+        self.font_renderer = font_renderer
+        self._show_label = True
+        self.label_width, self.label_height = (0, 0)
+        self._padding = 2
+
+        self.set_label(label)
+        self.set_icon(icon_path)
+
+    def set_label(self, label):
+        self.label = label
+        self.label_width, self.label_height = self.font_renderer.size(self.label)
+
+    def set_icon(self, icon):
+        self.icon_path = icon
+        # TODO - this is a terrible way to check if we should show the image
+        self._show_icon = True if len(self.icon_path) > 0 else False
+
+    def get_width(self):
+        """
+        Gets the width of this object (including the icon width if an icon is specified
+        @return:
+        """
+        icon_width = (self.label_height + self._padding) if self._show_icon else 0
+        return self._padding + icon_width + self.label_width + self._padding
+
+    def get_height(self):
+        """
+        Gets the height of this object
+        @return:
+        """
+        return self.label_height + self._padding
+
+    def show_label(self):
+        self._show_label = True
+
+    def hide_label(self):
+        self._show_label = False
+
+    def _paint(self):
+        if self._show_label:
+            font_surface = font.create_label(self.font_renderer, self.label, BLACK)
+
+        if self._show_icon:
+            image_path = os.path.join("assets", self.icon_path)
+            image_width, image_height = (self.label_height - (self._padding * 2)), (self.label_height - (self._padding * 2))
+            image_surface = pygame.image.load(image_path)
+            image_surface = pygame.transform.smoothscale(image_surface, (image_width, image_height))
+
+        display_width = self.get_width()
+        display_height = self.get_height()
+        display_surface = pygame.Surface(
+            (display_width,
+             display_height)
+        )
+        display_surface.fill(BLACK)
+        colors.fill_gradient(
+            display_surface,
+            WHITE,
+            GREY,
+            rect=Rect(
+                1,
+                1,
+                display_width - 3,
+                display_height - 2),
+            forward=True
+        )
+
+        display_surface.blit(image_surface, (self._padding, self._padding))
+        display_surface.blit(font_surface, (self._padding + image_width, self._padding)) if self._show_label else None
+
+        self.image = display_surface
+        self.set_rect(self._x, self._y, self.image.get_width(), self.image.get_height())
+
+    def update(self, *args):
+        if len(args) > 0:
+            label, icon = args[0]
+            self.set_label(label)
+            self.set_icon(icon)
+        self._paint()

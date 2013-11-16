@@ -13,21 +13,44 @@ from pygame.locals import *
 
 from colors import *
 from physics import collision_detection
-from sprites import Cell
+from sprites import Cell, GameFont
+
+import font
 
 
 def main():
     size = width, height = 320, 320
 
-    screen = pygame.display.set_mode(size, NOFRAME)
+    screen = pygame.display.set_mode(size)
 
-    pygame.font.init()
-    default_font = pygame.font.get_default_font()
-    font_renderer = pygame.font.Font(default_font, 15)
+    default_font, font_renderer = font.init()
 
-    start = font_renderer.render("Start", 1, BLACK)
-    clear = font_renderer.render("Clear", 1, BLACK)
-    random_seed = font_renderer.render("Random", 1, BLACK)
+    start = GameFont(
+        font_renderer,
+        "Start",
+        "glyphicons_173_play.png"
+    )
+    start.set_pos(5, 5)
+
+    clear_screen = GameFont(
+        font_renderer,
+        "Clear",
+        "glyphicons_067_cleaning.png"
+    )
+    clear_screen.set_pos(
+        (screen.get_width() - clear_screen.get_width() - 5),
+        5
+    )
+
+    random_seed = GameFont(
+        font_renderer,
+        "Random",
+        "glyphicons_009_magic.png"
+    )
+    random_seed.set_pos(
+        (screen.get_width() / 2) - random_seed.get_width() / 2,
+        5
+    )
 
     is_paused = True
 
@@ -37,9 +60,10 @@ def main():
 
     game_sprites = [Cell(0, 0, *cell_size) for x in xrange(rows * cols)]
 
+    font_sprite_renderer = pygame.sprite.RenderPlain(start, random_seed, clear_screen)
     sprite_renderer = pygame.sprite.RenderPlain(game_sprites)
 
-    run_y = 20
+    run_y = 27
     for row in range(rows):
         run_x = (Decimal(screen.get_width()) / Decimal(2)) - (Decimal(cols * (cell_size[0] + cell_padding)) / Decimal(2))
         for col in range(cols):
@@ -70,10 +94,6 @@ def main():
     game_ticks_elapsed = 0
     game_ticks_fps = 120
 
-    start_loc = (0, 0)
-    clear_loc = (0, 0)
-    random_loc = (0, 0)
-
     last_highlighted = Cell(0, 0, 0, 0)
     while True:
         # HANDLES THE INPUT
@@ -81,13 +101,15 @@ def main():
             if event.type == QUIT:
                 sys.exit()
             if event.type == MOUSEBUTTONDOWN:
+                pressed = pygame.mouse.get_pressed()
                 mouse_loc = pygame.mouse.get_pos()
-                if collision_detection(start_loc, mouse_loc):
-                    start = font_renderer.render("Pause" if is_paused else "Start", 1, BLACK)
+                if collision_detection(start.get_rect(), mouse_loc):
+                    args = ("Pause", "glyphicons_174_pause.png") if is_paused else ("Start", "glyphicons_173_play.png")
+                    start.update(args)
                     is_paused = not is_paused
 
                 if is_paused:
-                    if collision_detection(random_loc, mouse_loc):
+                    if collision_detection(random_seed.get_rect(), mouse_loc):
                         for sprite in sprite_renderer.sprites():
                             if random.randint(0, 1) == 0:
                                 sprite.resurrect()
@@ -95,7 +117,7 @@ def main():
                                 sprite.kill()
 
                     # Clears out the game board
-                    if collision_detection(clear_loc, mouse_loc):
+                    if collision_detection(clear_screen.get_rect(), mouse_loc):
                         for sprite in sprite_renderer.sprites():
                             sprite.kill()
 
@@ -103,7 +125,6 @@ def main():
                     for sprite in sprite_renderer.sprites():
                         if collision_detection(sprite.get_rect(), mouse_loc):
                             sprite.kill() if sprite.is_cell_alive() else sprite.resurrect()
-
                     sprite_renderer.update(True, False, True)
 
         if is_paused:
@@ -136,10 +157,12 @@ def main():
 
         # RENDER LOGIC GOES PAST THIS POINT
         fill_gradient(screen, WHITE, GREY)
-        start_loc = screen.blit(start, (5, 5))
-        random_loc = screen.blit(random_seed, ((screen.get_width() / 2) - (random_seed.get_width() / 2), 5))
-        clear_loc = screen.blit(clear, (screen.get_width() - clear.get_width() - 5,  5))
+        #start_loc = font.blit_font(start, screen, (5, 5))
+        #random_loc = screen.blit(random_seed, ((screen.get_width() / 2) - (random_seed.get_width() / 2), 5))
+        #clear_loc = screen.blit(clear, (screen.get_width() - clear.get_width() - 5,  5))
 
+        font_sprite_renderer.update()
+        font_sprite_renderer.draw(screen)
         sprite_renderer.draw(screen)
 
         pygame.display.flip()
