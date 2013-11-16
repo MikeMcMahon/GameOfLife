@@ -26,3 +26,7 @@ with the code and make any changes.  I do plan to add some more features/functio
 1. Game grid size
 1. Better configuration settings (rendering speed mostly)
 1. ~~Random pattern generation~~
+
+
+## Bundled with
+GLYPHICONS.com - [CC BY](http://creativecommons.org/licenses/by/3.0/)
