@@ -7,9 +7,6 @@ created: 11/13/13
 from decimal import Decimal
 import random
 import sys
-import Tkinter
-import tkFileDialog
-import tkMessageBox
 
 from pygame.locals import *
 import board
@@ -74,7 +71,54 @@ def main():
         5
     )
 
-    is_paused = True
+    game_state = board.GameState()
+
+    def start_clicked():
+        paused = game_state.is_paused
+        args = ("Stop", "glyphicons_174_pause.png") if paused else ("Start", "glyphicons_173_play.png")
+        start.set_label(args[0])
+        start.set_icon(args[1])
+        game_state.is_paused = not game_state.is_paused
+        return start_clicked
+
+    def random_clicked():
+        if game_state.is_paused:
+            for sprite in sprite_renderer.sprites():
+                if random.randint(0, 100) <= 50:
+                    sprite.resurrect()
+                else:
+                    sprite.kill()
+        return random_clicked
+
+    def clear_clicked():
+        if game_state.is_paused:
+            for sprite in sprite_renderer.sprites():
+                    sprite.kill()
+        return clear_clicked
+
+    def save_gameboard_clicked():
+        if game_state.is_paused:
+            gamefile.save_generation(board.collect_gameboard(game_sprites, rows, cols))
+        return save_gameboard_clicked
+
+    def load_gameboard_clicked():
+        if game_state.is_paused:
+            new_board = gamefile.load_generation()
+            if not new_board:
+                pass  # TODO - show a dialog that we failed...
+            else:
+                for i in range(len(new_board)):
+                    if new_board[i] == '0':
+                        game_sprites[i].kill()
+                    elif new_board[i] == '1':
+                        game_sprites[i].resurrect()
+        return load_gameboard_clicked
+
+    clear_screen.on_clicked(clear_clicked)
+    random_seed.on_clicked(random_clicked)
+    start.on_clicked(start_clicked)
+    save_generation.on_clicked(save_gameboard_clicked)
+    load_generation.on_clicked(load_gameboard_clicked)
 
     cols, rows = 25, 25
     cell_size = (10, 10)
@@ -124,49 +168,19 @@ def main():
                 sys.exit()
             if event.type == MOUSEBUTTONDOWN:
                 pressed = pygame.mouse.get_pressed()
-                if pressed[0] == 0:
-                    continue
                 mouse_loc = pygame.mouse.get_pos()
-                if collision_detection(start.get_rect(), mouse_loc):
-                    args = ("Pause", "glyphicons_174_pause.png") if is_paused else ("Start", "glyphicons_173_play.png")
-                    start.update(args)
-                    is_paused = not is_paused
+                font_sprite_renderer.update(mouse_loc, pressed)
 
-                if is_paused:
-                    if collision_detection(random_seed.get_rect(), mouse_loc):
-                        for sprite in sprite_renderer.sprites():
-                            if random.randint(0, 100) <= 50:
-                                sprite.resurrect()
-                            else:
-                                sprite.kill()
-
-                    # Clears out the game board
-                    if collision_detection(clear_screen.get_rect(), mouse_loc):
-                        for sprite in sprite_renderer.sprites():
-                            sprite.kill()
-
-                    if collision_detection(save_generation.get_rect(), mouse_loc):
-                        gamefile.save_generation(board.collect_gameboard(game_sprites, rows, cols))
-                    if collision_detection(load_generation.get_rect(), mouse_loc):
-                        new_board = gamefile.load_generation()
-                        if not new_board:
-                            pass # TODO - show a dialog that we failed...
-                        else:
-                            for i in range(len(new_board)):
-                                if new_board[i] == '0':
-                                    game_sprites[i].kill()
-                                elif new_board[i] == '1':
-                                    game_sprites[i].resurrect()
-
-
+                if game_state.is_paused:
                     # If the game is paused and we hover over the game piece???
                     for sprite in sprite_renderer.sprites():
                         if collision_detection(sprite.get_rect(), mouse_loc):
                             sprite.kill() if sprite.is_cell_alive() else sprite.resurrect()
                     sprite_renderer.update(True, False, True)
 
-        if is_paused:
-            mouse_loc = pygame.mouse.get_pos()
+        mouse_loc = pygame.mouse.get_pos()
+        font_sprite_renderer.update(mouse_loc, (0, 0, 0, 0))
+        if game_state.is_paused:
             # Check for any collisions
 
             hit_none = True
@@ -184,7 +198,7 @@ def main():
 
             sprite_renderer.update(True, False, True)
 
-        if game_ticks_elapsed - game_ticks >= game_ticks_fps and not is_paused:
+        if game_ticks_elapsed - game_ticks >= game_ticks_fps and not game_state.is_paused:
             game_ticks = game_ticks_elapsed
 
             sprite_renderer.update(False, False, False)

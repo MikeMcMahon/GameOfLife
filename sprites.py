@@ -3,6 +3,7 @@ from pygame.locals import *
 from pygame.rect import Rect
 from pygame.sprite import Sprite
 import colors
+from physics import collision_detection
 
 __author__ = 'Mike Mcmahon'
 
@@ -210,6 +211,9 @@ class GameButton(GameBase):
 
         self.set_label(label)
         self.set_icon(icon_path)
+        self._func = None
+        self._fill_forward = True
+        self._is_mouse_down = True
 
     def set_label(self, label):
         self.label = label
@@ -267,7 +271,7 @@ class GameButton(GameBase):
                 1,
                 display_width - 3,
                 display_height - 2),
-            forward=True
+            forward=self._fill_forward
         )
 
         display_surface.blit(image_surface, (self._padding, self._padding))
@@ -277,8 +281,28 @@ class GameButton(GameBase):
         self.set_rect(self._x, self._y, self.image.get_width(), self.image.get_height())
 
     def update(self, *args):
+        """
+        On update checks if we're being moused over, or if we're being clicked
+        @param args:
+            unpacked it should be the following tuples
+            (mouse_x,mouse_y)
+            (mouse buttons pressed)
+        @return:
+        """
         if len(args) > 0:
-            label, icon = args[0]
-            self.set_label(label)
-            self.set_icon(icon)
+            if collision_detection(self.get_rect(), args[0]):
+                # We're being moused over
+                self._fill_forward = False
+                if args[1][0] == 1 and not self._func is None and not self._is_mouse_down:
+                    self._is_mouse_down = True
+                    self._func()
+                elif args[1][0] == 0:
+                    self._is_mouse_down = False
+            else:
+                self._is_mouse_down = False
+                self._fill_forward = True
+
         self._paint()
+
+    def on_clicked(self, func):
+        self._func = func
