@@ -6,14 +6,20 @@ date: 11/17/13
 import Tkinter
 import tkFileDialog
 
-_root = Tkinter.Tk()
-_root.withdraw()
+
+class _FileHandler:
+    pass
+
+_root = _FileHandler()
+_root.windower = Tkinter.Tk()
+_root.windower.withdraw()
 _file_options = {
     'filetypes': [
         ('generation file .gen', '.gen'),
         ('all files', '.*')
     ]
 }
+
 
 def _write_content(filename, content):
     try:
@@ -23,6 +29,10 @@ def _write_content(filename, content):
         return False
 
     return True
+
+def _init():
+    _root.windower = Tkinter.Tk()
+    _root.windower.withdraw()
 
 def _read_content(filename):
     try:
@@ -36,16 +46,27 @@ def _read_content(filename):
 
 
 def _save_file(initialfile=''):
+    _init()
     _file_options['initialfile'] = initialfile
-    return tkFileDialog.asksaveasfilename(**_file_options)
+    filename = tkFileDialog.asksaveasfilename(**_file_options)
+    _root.windower.destroy()
+    _root.windower.quit()
+    return filename
+
 
 def _load_file(initialfile=''):
+    _init()
     _file_options['initialfile'] = initialfile
-    return tkFileDialog.askopenfilename(**_file_options)
+    filename = tkFileDialog.askopenfilename(**_file_options)
+    _root.windower.destroy()
+    _root.windower.quit()
+    return filename
+
 
 def save_generation(collected_board):
     filename = _save_file('generation.gen')
     return _write_content(filename, collected_board)
+
 
 def load_generation():
     filename = _load_file('generation.gen')
