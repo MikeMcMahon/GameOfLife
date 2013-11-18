@@ -15,12 +15,15 @@ The game of life has 4 basic rules:
 
 ## Overview
 
-This is a simple python implementation of the classic __Game of Life__ or __Life__.  Please feel free to expierment
+This is a simple python implementation of the classic __Game of Life__ or __Life__.  Please feel free to experiment
 with the code and make any changes.  I do plan to add some more features/functionality in the future.
 
 ## Planned Features
 
+1. ~~Save entire board~~
+1. ~~Load board~~
 1. Save shapes
+  1. Partial (shape saving exist, need shape creator window)
 1. Shape library
 1. Step through generations
 1. Game grid size

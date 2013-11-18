@@ -7,45 +7,67 @@ created: 11/13/13
 from decimal import Decimal
 import random
 import sys
-import pygame
+import Tkinter
+import tkFileDialog
+import tkMessageBox
 
 from pygame.locals import *
+import board
 
 from colors import *
+import gamefile
 from physics import collision_detection
-from sprites import Cell, GameFont
+from sprites import Cell, GameButton
 
 import font
 
 
 def main():
-    size = width, height = 320, 320
+    size = width, height = 320, 344
 
     screen = pygame.display.set_mode(size)
 
     default_font, font_renderer = font.init()
 
-    start = GameFont(
+    start = GameButton(
         font_renderer,
         "Start",
         "glyphicons_173_play.png"
     )
-    start.set_pos(5, 5)
-
-    clear_screen = GameFont(
+    random_seed = GameButton(
+        font_renderer,
+        "Random",
+        "glyphicons_009_magic.png"
+    )
+    clear_screen = GameButton(
         font_renderer,
         "Clear",
         "glyphicons_067_cleaning.png"
     )
+    load_generation = GameButton(
+        font_renderer,
+        "Load",
+        "glyphicons_144_folder_open.png"
+    )
+    save_generation = GameButton(
+        font_renderer,
+        "Save",
+        "glyphicons_446_floppy_save.png"
+    )
+
+    load_generation.set_pos(
+        screen.get_width() - load_generation.get_width() - 5,
+        clear_screen.get_height() + 10,
+    )
+    save_generation.set_pos(
+        load_generation.get_pos()[0] - save_generation.get_width() - 5,
+        clear_screen.get_height() + 10,
+    )
+
+    start.set_pos(5, 5)
     clear_screen.set_pos(
         (screen.get_width() - clear_screen.get_width() - 5),
         5
-    )
-
-    random_seed = GameFont(
-        font_renderer,
-        "Random",
-        "glyphicons_009_magic.png"
     )
     random_seed.set_pos(
         (screen.get_width() / 2) - random_seed.get_width() / 2,
@@ -60,10 +82,10 @@ def main():
 
     game_sprites = [Cell(0, 0, *cell_size) for x in xrange(rows * cols)]
 
-    font_sprite_renderer = pygame.sprite.RenderPlain(start, random_seed, clear_screen)
+    font_sprite_renderer = pygame.sprite.RenderPlain(start, random_seed, clear_screen, save_generation, load_generation)
     sprite_renderer = pygame.sprite.RenderPlain(game_sprites)
 
-    run_y = 27
+    run_y = (5 * 3) + (clear_screen.get_height() * 2)
     for row in range(rows):
         run_x = (Decimal(screen.get_width()) / Decimal(2)) - (Decimal(cols * (cell_size[0] + cell_padding)) / Decimal(2))
         for col in range(cols):
@@ -113,7 +135,7 @@ def main():
                 if is_paused:
                     if collision_detection(random_seed.get_rect(), mouse_loc):
                         for sprite in sprite_renderer.sprites():
-                            if random.randint(0, 1) == 0:
+                            if random.randint(0, 100) <= 50:
                                 sprite.resurrect()
                             else:
                                 sprite.kill()
@@ -122,6 +144,20 @@ def main():
                     if collision_detection(clear_screen.get_rect(), mouse_loc):
                         for sprite in sprite_renderer.sprites():
                             sprite.kill()
+
+                    if collision_detection(save_generation.get_rect(), mouse_loc):
+                        gamefile.save_generation(board.collect_gameboard(game_sprites, rows, cols))
+                    if collision_detection(load_generation.get_rect(), mouse_loc):
+                        new_board = gamefile.load_generation()
+                        if not new_board:
+                            pass # TODO - show a dialog that we failed...
+                        else:
+                            for i in range(len(new_board)):
+                                if new_board[i] == '0':
+                                    game_sprites[i].kill()
+                                elif new_board[i] == '1':
+                                    game_sprites[i].resurrect()
+
 
                     # If the game is paused and we hover over the game piece???
                     for sprite in sprite_renderer.sprites():
