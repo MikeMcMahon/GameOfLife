@@ -192,7 +192,7 @@ class Cell(GameBase):
         self.next_state = -1
 
 
-class GameFont(GameBase):
+class GameButton(GameBase):
 
     def __init__(self, font_renderer, label="", icon_path=""):
         GameBase.__init__(self)
