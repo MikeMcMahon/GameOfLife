@@ -205,10 +205,14 @@ class GameButton(GameBase):
         self._show_icon = False
         self.pos = self._x, self._y = 0, 0
         self.font_renderer = font_renderer
+        self._font_surface = None
+        self._icon_surface = None
         self._show_label = True
         self.label_width, self.label_height = (0, 0)
         self._padding = 2
 
+        self._label_dirty = False
+        self._icon_dirty = False
         self.set_label(label)
         self.set_icon(icon_path)
         self._func = None
@@ -216,10 +220,12 @@ class GameButton(GameBase):
         self._is_mouse_down = True
 
     def set_label(self, label):
+        self._label_dirty = True
         self.label = label
         self.label_width, self.label_height = self.font_renderer.size(self.label)
 
     def set_icon(self, icon):
+        self._icon_dirty = True
         self.icon_path = icon
         # TODO - this is a terrible way to check if we should show the image
         self._show_icon = True if len(self.icon_path) > 0 else False
@@ -246,39 +252,44 @@ class GameButton(GameBase):
         self._show_label = False
 
     def _paint(self):
-        if self._show_label:
-            font_surface = font.create_label(self.font_renderer, self.label, BLACK)
+        if self._show_label and self._label_dirty:
+            self._font_surface = font.create_label(self.font_renderer, self.label, BLACK)
 
-        if self._show_icon:
+        if self._show_icon and self._icon_dirty:
             image_path = os.path.join("assets", self.icon_path)
-            image_width, image_height = (self.label_height - (self._padding * 2)), (self.label_height - (self._padding * 2))
-            image_surface = pygame.image.load(image_path)
-            image_surface = pygame.transform.smoothscale(image_surface, (image_width, image_height))
+            image_width, image_height = \
+                (self.label_height - (self._padding * 2)), \
+                (self.label_height - (self._padding * 2))
+            self._icon_surface = pygame.image.load(image_path)
+            self._icon_surface = pygame.transform.smoothscale(self._icon_surface, (image_width, image_height))
+        else:
+            image_width = 0
 
-        display_width = self.get_width()
-        display_height = self.get_height()
-        display_surface = pygame.Surface(
-            (display_width,
-             display_height)
-        )
-        display_surface.fill(BLACK)
-        colors.fill_gradient(
-            display_surface,
-            WHITE,
-            GREY,
-            rect=Rect(
-                1,
-                1,
-                display_width - 3,
-                display_height - 2),
-            forward=self._fill_forward
-        )
+        if self._label_dirty or self._icon_dirty:
+            display_width = self.get_width()
+            display_height = self.get_height()
+            display_surface = pygame.Surface(
+                (display_width,
+                 display_height)
+            )
+            display_surface.fill(BLACK)
+            colors.fill_gradient(
+                display_surface,
+                WHITE,
+                GREY,
+                rect=Rect(
+                    1,
+                    1,
+                    display_width - 3,
+                    display_height - 2),
+                forward=self._fill_forward
+            )
 
-        display_surface.blit(image_surface, (self._padding, self._padding))
-        display_surface.blit(font_surface, (self._padding + image_width, self._padding)) if self._show_label else None
+            display_surface.blit(self._icon_surface, (self._padding, self._padding))
+            display_surface.blit(self._font_surface, (self._padding + image_width, self._padding)) if self._show_label else None
 
-        self.image = display_surface
-        self.set_rect(self._x, self._y, self.image.get_width(), self.image.get_height())
+            self.image = display_surface
+            self.set_rect(self._x, self._y, self.image.get_width(), self.image.get_height())
 
     def update(self, *args):
         """
