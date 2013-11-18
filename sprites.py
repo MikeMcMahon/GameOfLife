@@ -1,4 +1,5 @@
 import os
+from pygame.locals import *
 from pygame.rect import Rect
 from pygame.sprite import Sprite
 import colors
@@ -169,12 +170,14 @@ class Cell(GameBase):
 
         if self.cell_alive:
             self.image.fill(self.alive_color, (1, 1, 8, 8))
-        elif self.is_highlighted:
-            self.image.fill(self.highlight_color, (1, 1, 8, 8))
-        elif self.is_neighbor_highlighted:
-            self.image.fill(self.neighbor_highlight, (1, 1, 8, 8))
         else:
             self.image.fill(self.dead_color, (1, 1, 8, 8))
+
+        # Applied after main color to create an "overlay" effect
+        if self.is_highlighted:
+            self.image.fill(self.highlight_color, (1, 1, 8, 8), BLEND_RGBA_MULT)
+        elif self.is_neighbor_highlighted:
+            self.image.fill(self.neighbor_highlight, (1, 1, 8, 8), BLEND_RGBA_MULT)
 
     def set_color(self, alive, dead, highlight):
         self.alive_color = alive
