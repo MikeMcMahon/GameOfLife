@@ -30,9 +30,11 @@ def _write_content(filename, content):
 
     return True
 
+
 def _init():
     _root.windower = Tkinter.Tk()
     _root.windower.withdraw()
+
 
 def _read_content(filename):
     try:
