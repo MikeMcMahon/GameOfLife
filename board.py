@@ -5,6 +5,12 @@ date: 11/17/13
 
 import os
 
+
+class GameState:
+    def __init__(self):
+        self.is_paused = True
+
+
 def collect_gameboard(cells, rows, cols):
     collected = ''
     for row in range(rows):
