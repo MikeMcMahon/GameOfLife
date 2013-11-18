@@ -24,33 +24,19 @@ def main():
 
     screen = pygame.display.set_mode(size)
 
-    default_font, font_renderer = font.init()
+    default_font, gamefont = font.init()
 
     start = GameButton(
-        font_renderer,
+        gamefont,
         "Start",
         "glyphicons_173_play.png"
     )
-    random_seed = GameButton(
-        font_renderer,
-        "Random",
-        "glyphicons_009_magic.png"
-    )
-    clear_screen = GameButton(
-        font_renderer,
-        "Clear",
-        "glyphicons_067_cleaning.png"
-    )
-    load_generation = GameButton(
-        font_renderer,
-        "Load",
-        "glyphicons_144_folder_open.png"
-    )
-    save_generation = GameButton(
-        font_renderer,
-        "Save",
-        "glyphicons_446_floppy_save.png"
-    )
+    random_seed = GameButton(gamefont, "Random", "glyphicons_009_magic.png")
+    clear_screen = GameButton(gamefont, "Clear", "glyphicons_067_cleaning.png")
+    load_generation = GameButton(gamefont, "Load", "glyphicons_144_folder_open.png")
+    save_generation = GameButton(gamefont, "Save", "glyphicons_446_floppy_save.png")
+    step_generation = GameButton(gamefont, "Step", "glyphicons_178_step_forward.png")
+    game_settings = GameButton(gamefont, "Settings", "glyphicons_280_settings.png")
 
     load_generation.set_pos(
         screen.get_width() - load_generation.get_width() - 5,
@@ -60,7 +46,6 @@ def main():
         load_generation.get_pos()[0] - save_generation.get_width() - 5,
         clear_screen.get_height() + 10,
     )
-
     start.set_pos(5, 5)
     clear_screen.set_pos(
         (screen.get_width() - clear_screen.get_width() - 5),
@@ -69,6 +54,10 @@ def main():
     random_seed.set_pos(
         (screen.get_width() / 2) - random_seed.get_width() / 2,
         5
+    )
+    step_generation.set_pos(
+        5,
+        start.get_height() + 10
     )
 
     game_state = board.GameState()
@@ -114,11 +103,18 @@ def main():
                         game_sprites[i].resurrect()
         return load_gameboard_clicked
 
+    def step_generation_clicked():
+        if game_state.is_paused:
+            sprite_renderer.update(False, False, False)
+            sprite_renderer.update(False, True, True)
+        return step_generation_clicked
+
     clear_screen.on_clicked(clear_clicked)
     random_seed.on_clicked(random_clicked)
     start.on_clicked(start_clicked)
     save_generation.on_clicked(save_gameboard_clicked)
     load_generation.on_clicked(load_gameboard_clicked)
+    step_generation.on_clicked(step_generation_clicked)
 
     cols, rows = 25, 25
     cell_size = (10, 10)
@@ -126,7 +122,13 @@ def main():
 
     game_sprites = [Cell(0, 0, *cell_size) for x in xrange(rows * cols)]
 
-    font_sprite_renderer = pygame.sprite.RenderPlain(start, random_seed, clear_screen, save_generation, load_generation)
+    font_sprite_renderer = pygame.sprite.RenderPlain(
+        start,
+        random_seed,
+        clear_screen,
+        save_generation,
+        load_generation,
+        step_generation)
     sprite_renderer = pygame.sprite.RenderPlain(game_sprites)
 
     run_y = (5 * 3) + (clear_screen.get_height() * 2)
