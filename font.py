@@ -10,10 +10,10 @@ import pygame
 from colors import BLACK
 
 
-def init():
+def init(size=15):
     pygame.font.init()
     default_font = pygame.font.get_default_font()
-    font_renderer = pygame.font.Font(default_font, 15)
+    font_renderer = pygame.font.Font(default_font, size)
 
     return default_font, font_renderer
 
