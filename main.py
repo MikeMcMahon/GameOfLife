@@ -20,17 +20,10 @@ import font
 
 
 def main():
-    size = width, height = 320, 344
 
-    screen = pygame.display.set_mode(size)
+    default_font, gamefont = font.init(13)
 
-    default_font, gamefont = font.init()
-
-    start = GameButton(
-        gamefont,
-        "Start",
-        "glyphicons_173_play.png"
-    )
+    start = GameButton(gamefont, "Start", "glyphicons_173_play.png")
     random_seed = GameButton(gamefont, "Random", "glyphicons_009_magic.png")
     clear_screen = GameButton(gamefont, "Clear", "glyphicons_067_cleaning.png")
     load_generation = GameButton(gamefont, "Load", "glyphicons_144_folder_open.png")
@@ -38,26 +31,36 @@ def main():
     step_generation = GameButton(gamefont, "Step", "glyphicons_178_step_forward.png")
     game_settings = GameButton(gamefont, "Settings", "glyphicons_280_settings.png")
 
+    cols, rows = 25, 25
+    cell_size = (10, 10)
+    cell_padding = 1
+    size = width, height = 320, ((start.get_height()) * 2) + (rows * (cell_size[1] + cell_padding)) + 20
+    screen = pygame.display.set_mode(size)
+
     load_generation.set_pos(
-        screen.get_width() - load_generation.get_width() - 5,
-        clear_screen.get_height() + 10,
+        save_generation.get_width() + 10,
+        screen.get_height() - load_generation.get_height() - 5,
     )
     save_generation.set_pos(
-        load_generation.get_pos()[0] - save_generation.get_width() - 5,
-        clear_screen.get_height() + 10,
+        5,
+        screen.get_height() - save_generation.get_height() - 5,
     )
     start.set_pos(5, 5)
-    clear_screen.set_pos(
-        (screen.get_width() - clear_screen.get_width() - 5),
-        5
+    step_generation.set_pos(
+        start.get_pos()[0] + start.get_width() + 5,
+        5,
     )
     random_seed.set_pos(
-        (screen.get_width() / 2) - random_seed.get_width() / 2,
+        (step_generation.get_pos()[0] + step_generation.get_width() + 5),
         5
     )
-    step_generation.set_pos(
-        5,
-        start.get_height() + 10
+    clear_screen.set_pos(
+        (random_seed.get_pos()[0] + random_seed.get_width() + 5),
+        5
+    )
+    game_settings.set_pos(
+        screen.get_width() - game_settings.get_width() - 5,
+        screen.get_height() - game_settings.get_height() - 5
     )
 
     game_state = board.GameState()
@@ -116,11 +119,9 @@ def main():
     load_generation.on_clicked(load_gameboard_clicked)
     step_generation.on_clicked(step_generation_clicked)
 
-    cols, rows = 25, 25
-    cell_size = (10, 10)
-    cell_padding = 1
-
     game_sprites = [Cell(0, 0, *cell_size) for x in xrange(rows * cols)]
+    for sprite in game_sprites:
+        sprite.alive_color = GREEN
 
     font_sprite_renderer = pygame.sprite.RenderPlain(
         start,
@@ -128,10 +129,13 @@ def main():
         clear_screen,
         save_generation,
         load_generation,
-        step_generation)
+        step_generation,
+        game_settings
+    )
+
     sprite_renderer = pygame.sprite.RenderPlain(game_sprites)
 
-    run_y = (5 * 3) + (clear_screen.get_height() * 2)
+    run_y = (5 * 2) + (clear_screen.get_height() * 1)
     for row in range(rows):
         run_x = (Decimal(screen.get_width()) / Decimal(2)) - (Decimal(cols * (cell_size[0] + cell_padding)) / Decimal(2))
         for col in range(cols):
