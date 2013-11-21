@@ -180,10 +180,11 @@ class Cell(GameBase):
             self.image.fill(self.dead_color, (1, 1, 8, 8))
 
         # Applied after main color to create an "overlay" effect
+        mode = BLEND_RGBA_MULT if not self.cell_alive else BLEND_RGBA_MAX
         if self.is_highlighted:
-            self.image.fill(self.highlight_color, (1, 1, 8, 8), BLEND_RGBA_MULT)
+            self.image.fill(self.highlight_color, (1, 1, 8, 8), mode)
         elif self.is_neighbor_highlighted:
-            self.image.fill(self.neighbor_highlight, (1, 1, 8, 8), BLEND_RGBA_MULT)
+            self.image.fill(self.neighbor_highlight, (1, 1, 8, 8), mode)
 
     def set_color(self, alive, dead, highlight):
         self.alive_color = alive
@@ -291,7 +292,8 @@ class GameButton(GameBase):
             )
 
             display_surface.blit(self._icon_surface, (self._padding, self._padding))
-            display_surface.blit(self._font_surface, (self._padding + image_width, self._padding)) if self._show_label else None
+            display_surface.blit(self._font_surface,
+                                 (self._padding + image_width, self._padding)) if self._show_label else None
 
             self.image = display_surface
             self.set_rect(self._x, self._y, self.image.get_width(), self.image.get_height())
