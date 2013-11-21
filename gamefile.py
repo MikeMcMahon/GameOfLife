@@ -1,6 +1,8 @@
 """
 author: Mike McMahon
-date: 11/17/13
+
+created: 11/13/13
+
 """
 
 import Tkinter

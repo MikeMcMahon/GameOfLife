@@ -1,4 +1,9 @@
-__author__ = 'Mike McMahon'
+"""
+author: Mike McMahon
+
+created: 11/13/13
+
+"""
 
 import pygame
 

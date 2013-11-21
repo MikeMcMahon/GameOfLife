@@ -1,6 +1,8 @@
 """
-author: Family
-date: 11/17/13
+author: Mike McMahon
+
+created: 11/13/13
+
 """
 
 import os

@@ -4,6 +4,7 @@ author: Mike McMahon
 created: 11/13/13
  
 """
+
 from decimal import Decimal
 import random
 import sys

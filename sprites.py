@@ -1,11 +1,16 @@
+"""
+author: Mike McMahon
+
+created: 11/13/13
+
+"""
+
 import os
 from pygame.locals import *
 from pygame.rect import Rect
 from pygame.sprite import Sprite
 import colors
 from physics import collision_detection
-
-__author__ = 'Mike Mcmahon'
 
 import pygame
 import font
