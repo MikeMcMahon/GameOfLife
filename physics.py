@@ -5,6 +5,7 @@ created: 11/13/13
 
 """
 
+
 def collision_detection(rect, point):
     """
         Does a single point lay within the given rectangle
