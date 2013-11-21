@@ -21,15 +21,15 @@ import font
 
 def main():
 
-    default_font, gamefont = font.init(13)
+    default_font, game_font = font.init(13)
 
-    start = GameButton(gamefont, "Start", "glyphicons_173_play.png")
-    random_seed = GameButton(gamefont, "Random", "glyphicons_009_magic.png")
-    clear_screen = GameButton(gamefont, "Clear", "glyphicons_067_cleaning.png")
-    load_generation = GameButton(gamefont, "Load", "glyphicons_144_folder_open.png")
-    save_generation = GameButton(gamefont, "Save", "glyphicons_446_floppy_save.png")
-    step_generation = GameButton(gamefont, "Step", "glyphicons_178_step_forward.png")
-    game_settings = GameButton(gamefont, "Settings", "glyphicons_280_settings.png")
+    start = GameButton(game_font, "Start", "glyphicons_173_play.png")
+    random_seed = GameButton(game_font, "Random", "glyphicons_009_magic.png")
+    clear_screen = GameButton(game_font, "Clear", "glyphicons_067_cleaning.png")
+    load_generation = GameButton(game_font, "Load", "glyphicons_144_folder_open.png")
+    save_generation = GameButton(game_font, "Save", "glyphicons_446_floppy_save.png")
+    step_generation = GameButton(game_font, "Step", "glyphicons_178_step_forward.png")
+    game_settings = GameButton(game_font, "Settings", "glyphicons_280_settings.png")
 
     cols, rows = 25, 25
     cell_size = (10, 10)
