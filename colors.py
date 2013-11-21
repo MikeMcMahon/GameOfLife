@@ -9,6 +9,7 @@ YELLOW = 255, 255, 85, 255
 GREY = 172, 172, 172, 255
 GREEN = 50, 150, 0, 255
 
+
 def fill_gradient(surface, color, gradient, rect=None, vertical=True, forward=True):
     """fill a surface with a gradient pattern
     Parameters:
