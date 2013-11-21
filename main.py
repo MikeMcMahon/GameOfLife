@@ -67,11 +67,10 @@ def main():
     game_state = board.GameState()
 
     def start_clicked():
-        paused = game_state.is_paused
-        args = ("Stop", "glyphicons_174_pause.png") if paused else ("Start", "glyphicons_173_play.png")
+        args = ("Stop", "glyphicons_174_pause.png") if game_state.is_paused else ("Start", "glyphicons_173_play.png")
         start.set_label(args[0])
         start.set_icon(args[1])
-        game_state.is_paused = not game_state.is_paused
+        game_state.unpause() if game_state.is_paused else game_state.pause()
         return start_clicked
 
     def random_clicked():
