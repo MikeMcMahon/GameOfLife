@@ -19,7 +19,7 @@ In this mode `right + click` any two blocks to draw a box around a particular ce
 
 While in __shape select mode__ clicking on `load` will load a shape and allow you to drop it anywhere on the screen with a `left + click`
 
-Pressing `middle + click` will clear the __shape select mode__ unloading the chape and clearing the highlight from the screen
+Pressing `middle + click` will clear the __shape select mode__ unloading the shape and clearing the highlight from the screen
 
 ## Overview
 
