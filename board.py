@@ -112,7 +112,7 @@ class ShapeSelect:
     def clear_last(self):
         self.last = (-1, -1)
 
-    def clear(self):
+    def clear_all(self):
         self.clear_first()
         self.clear_last()
         self.clear_loaded()

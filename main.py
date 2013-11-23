@@ -78,7 +78,7 @@ def main():
             game_state.is_paused = True
             game_state.is_shape_load = False
             game_state.is_shape_select = False
-            shape_select.clear()
+            shape_select.clear_all()
             shape_select.clear_loaded()
             for sprite in game_sprites:
                 sprite.background_color = LIGHT_BLUE if game_state.is_shape_select else GREY
@@ -99,7 +99,7 @@ def main():
                 if game_state.is_shape_select and not game_state.is_shape_load:
                     sprite.is_shape_selected = False
                     sprite.clear_highlight(True)
-                    shape_select.clear()
+                    shape_select.clear_all()
                 else:
                     sprite.kill()
         return clear_clicked
@@ -212,7 +212,7 @@ def main():
                         start.set_icon("glyphicons_173_play.png")
                         start.set_label("Start")
                         load_generation.set_label("Load")
-                        shape_select.clear()
+                        shape_select.clear_all()
                         shape_select.highlight_selected(cols, game_sprites)
                     else:
                         start.set_icon("glyphicons_099_vector_path_all.png")
@@ -229,7 +229,7 @@ def main():
                 if game_state.is_paused:
                     if mouse_middle == 1 and game_state.is_shape_load and game_state.is_shape_select:
                         game_state.is_shape_load = False
-                        shape_select.clear()
+                        shape_select.clear_all()
                         shape_select.highlight_selected(cols, game_sprites)
 
                     if mouse_right == 1 and game_state.is_shape_select:
