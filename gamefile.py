@@ -16,6 +16,7 @@ _root.windower.withdraw()
 _file_options = {
     'filetypes': [
         ('generation file .gen', '.gen'),
+        ('shape file .shp', '.shp'),
         ('all files', '.*')
     ]
 }
@@ -47,6 +48,17 @@ def _read_content(filename):
         return False
 
 
+def _read_shape(filename):
+    try:
+        with open(filename, 'rb') as game_file:
+            content = ''
+            for row in game_file:
+                content += row.rstrip() + "!"
+            return content
+    except IOError:
+        return False
+
+
 def _save_file(initialfile=''):
     _init()
     _file_options['initialfile'] = initialfile
@@ -68,6 +80,16 @@ def _load_file(initialfile=''):
 def save_generation(collected_board):
     filename = _save_file('generation.gen')
     return _write_content(filename, collected_board)
+
+
+def save_shape(collected_shape):
+    filename = _save_file('shape.shp')
+    return _write_content(filename, collected_shape)
+
+
+def load_shape():
+    filename = _load_file('shape.shp')
+    return _read_shape(filename)
 
 
 def load_generation():

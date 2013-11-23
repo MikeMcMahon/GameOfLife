@@ -13,6 +13,12 @@ The game of life has 4 basic rules:
 1. Any live cell with more than three live neighbors dies, as if by overcrowding
 1. Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction (or resurrection in our case)
 
+### Shape Select Mode
+While the game is paused pressing `r-shift` will enter into shape select mode (the board game will change to a light blue).
+In this mode `right + click` any two blocks to draw a box around a particular cell generation. Clicking `save` while in __shape select mode__ will save just the particular region.
+
+While in __shape select mode__ clicking on `load` will load a shape and allow you to drop it anywhere on the screen with a `left + click`
+
 ## Overview
 
 This is a simple python implementation of the classic __Game of Life__ or __Life__.  Please feel free to experiment
@@ -20,15 +26,15 @@ with the code and make any changes.  I do plan to add some more features/functio
 
 ## Planned Features
 
-1. ~~Save entire board~~
-1. ~~Load board~~
-1. Save shapes
-  1. Partial (shape saving exist, need shape creator window)
-1. Shape library
-1. ~~Step through generations~~
-1. Game grid size
-1. Better configuration settings (rendering speed mostly)
-1. ~~Random pattern generation~~
+- [x] Save entire board
+- [x] Load board
+- [x] Save shapes
+- [x] Load shapes
+- [ ] Shape library
+- [x] Step through generations
+- [ ] Game grid size
+- [ ] Better configuration settings (rendering speed mostly)
+- [x] Random pattern generation
 
 
 ## Bundled with
