@@ -26,7 +26,7 @@ with the code and make any changes.  I do plan to add some more features/functio
 
 ## Planned Features
 
-- ~~Save entire board~
+- ~~Save entire board~~
 - ~~Load board~~
 - ~~Save shapes~~
 - ~~Load shapes~~
