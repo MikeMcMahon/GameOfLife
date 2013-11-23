@@ -26,15 +26,15 @@ with the code and make any changes.  I do plan to add some more features/functio
 
 ## Planned Features
 
-- [x] Save entire board
-- [x] Load board
-- [x] Save shapes
-- [x] Load shapes
-- [ ] Shape library
-- [x] Step through generations
-- [ ] Game grid size
-- [ ] Better configuration settings (rendering speed mostly)
-- [x] Random pattern generation
+- ~~Save entire board~
+- ~~Load board~~
+- ~~Save shapes~~
+- ~~Load shapes~~
+- shape library
+- ~~Step through generations~~
+- Game grid size
+- Better configuration settings (rendering speed mostly)
+- ~~Random pattern generation~~
 
 
 ## Bundled with
