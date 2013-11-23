@@ -14,7 +14,7 @@ The game of life has 4 basic rules:
 1. Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction (or resurrection in our case)
 
 ### Shape Select Mode
-While the game is paused pressing `r-shift` will enter into shape select mode (the board game will change to a light blue).
+While the game is paused pressing `shift` will enter into shape select mode (the board game will change to a light blue).
 In this mode `right + click` any two blocks to draw a box around a particular cell generation. Clicking `save` while in __shape select mode__ will save just the particular region.
 
 While in __shape select mode__ clicking on `load` will load a shape and allow you to drop it anywhere on the screen with a `left + click`
