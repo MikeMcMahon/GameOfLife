@@ -108,6 +108,8 @@ class ShapeSelect:
         @param cols:
         @param sprites:
         @return:
+
+        the sprites and the columns and rows for this generation
         """
         x1, y1 = self.first
         x2, y2 = self.last
@@ -126,9 +128,9 @@ class ShapeSelect:
         dest_sprites = list()
         for x in x_range:
             for y in y_range:
-                dest_sprites.append(sprites[(y * cols) + x])
+                dest_sprites.append(sprites[(x * cols) + y])
 
-        return dest_sprites, (max_x - min_x) + 1, (max_y - min_y) + 1
+        return dest_sprites, (max_y - min_y) + 1, (max_x - min_x) + 1
 
     def clear_first(self):
         """
