@@ -45,13 +45,16 @@ class Cell(GameBase):
         GameBase.__init__(self)
         self.set_rect(x, y, width, height)
         self.image = pygame.Surface((width, height), pygame.SRCALPHA)
+        self.background_color = GREY
         self.alive_color = GREY
         self.dead_color = WHITE
         self.highlight_color = RED
         self.neighbor_highlight = YELLOW
+        self.shape_select_color = PURPLE
         self.is_neighbor_highlighted = False
         self.cell_alive = False
         self.is_highlighted = False
+        self.is_shape_selected = False
         self.next_state = -1
         self._fill_color()
         self._neighbors = list()
@@ -172,7 +175,7 @@ class Cell(GameBase):
         """
         Applies the specified color to the sprite
         """
-        self.image.fill(GREY)
+        self.image.fill(self.background_color)
 
         if self.cell_alive:
             self.image.fill(self.alive_color, (1, 1, 8, 8))
@@ -185,6 +188,9 @@ class Cell(GameBase):
             self.image.fill(self.highlight_color, (1, 1, 8, 8), mode)
         elif self.is_neighbor_highlighted:
             self.image.fill(self.neighbor_highlight, (1, 1, 8, 8), mode)
+
+        if self.is_shape_selected:
+            self.image.fill(self.shape_select_color, (1, 1, 8, 8), BLEND_RGBA_MULT)
 
     def set_color(self, alive, dead, highlight):
         self.alive_color = alive

@@ -4,7 +4,6 @@ author: Mike McMahon
 created: 11/13/13
  
 """
-
 from decimal import Decimal
 import random
 import sys
@@ -22,15 +21,15 @@ import font
 
 def main():
 
-    default_font, game_font = font.init(13)
+    default_font, gamefont = font.init(13)
 
-    start = GameButton(game_font, "Start", "glyphicons_173_play.png")
-    random_seed = GameButton(game_font, "Random", "glyphicons_009_magic.png")
-    clear_screen = GameButton(game_font, "Clear", "glyphicons_067_cleaning.png")
-    load_generation = GameButton(game_font, "Load", "glyphicons_144_folder_open.png")
-    save_generation = GameButton(game_font, "Save", "glyphicons_446_floppy_save.png")
-    step_generation = GameButton(game_font, "Step", "glyphicons_178_step_forward.png")
-    game_settings = GameButton(game_font, "Settings", "glyphicons_280_settings.png")
+    start = GameButton(gamefont, "Start", "glyphicons_173_play.png")
+    random_seed = GameButton(gamefont, "Random", "glyphicons_009_magic.png")
+    clear_screen = GameButton(gamefont, "Clear", "glyphicons_067_cleaning.png")
+    load_generation = GameButton(gamefont, "Load", "glyphicons_144_folder_open.png")
+    save_generation = GameButton(gamefont, "Save", "glyphicons_446_floppy_save.png")
+    step_generation = GameButton(gamefont, "Step", "glyphicons_178_step_forward.png")
+    game_settings = GameButton(gamefont, "Settings", "glyphicons_280_settings.png")
 
     cols, rows = 25, 25
     cell_size = (10, 10)
@@ -67,14 +66,26 @@ def main():
     game_state = board.GameState()
 
     def start_clicked():
-        args = ("Stop", "glyphicons_174_pause.png") if game_state.is_paused else ("Start", "glyphicons_173_play.png")
-        start.set_label(args[0])
-        start.set_icon(args[1])
-        game_state.unpause() if game_state.is_paused else game_state.pause()
+        if not game_state.is_shape_select:
+            paused = game_state.is_paused
+            args = ("Stop", "glyphicons_174_pause.png") if paused else ("Start", "glyphicons_173_play.png")
+            start.set_label(args[0])
+            start.set_icon(args[1])
+            game_state.is_paused = not game_state.is_paused
+        elif game_state.is_shape_select:
+            start.set_label("Start")
+            start.set_icon("glyphicons_173_play.png")
+            game_state.is_paused = True
+            game_state.is_shape_load = False
+            game_state.is_shape_select = False
+            shape_select.clear_all()
+            shape_select.clear_loaded()
+            for sprite in game_sprites:
+                sprite.background_color = LIGHT_BLUE if game_state.is_shape_select else GREY
         return start_clicked
 
     def random_clicked():
-        if game_state.is_paused:
+        if game_state.is_paused and not game_state.is_shape_select:
             for sprite in sprite_renderer.sprites():
                 if random.randint(0, 100) <= 50:
                     sprite.resurrect()
@@ -85,29 +96,46 @@ def main():
     def clear_clicked():
         if game_state.is_paused:
             for sprite in sprite_renderer.sprites():
+                if game_state.is_shape_select and not game_state.is_shape_load:
+                    sprite.is_shape_selected = False
+                    sprite.clear_highlight(True)
+                    shape_select.clear_all()
+                else:
                     sprite.kill()
         return clear_clicked
 
     def save_gameboard_clicked():
         if game_state.is_paused:
-            gamefile.save_generation(board.collect_gameboard(game_sprites, rows, cols))
+            if not game_state.is_shape_select:
+                gamefile.save_generation(board.collect_gameboard(game_sprites, rows, cols))
+            else:
+                gamefile.save_shape(board.collect_gameboard(*shape_select.get_selected(rows, game_sprites)))
         return save_gameboard_clicked
 
     def load_gameboard_clicked():
         if game_state.is_paused:
-            new_board = gamefile.load_generation()
-            if not new_board:
-                pass  # TODO - show a dialog that we failed...
+            if not game_state.is_shape_select:
+                new_board = gamefile.load_generation()
+                if not new_board:
+                    pass  # TODO - show a dialog that we failed...
+                else:
+                    for i in range(len(new_board)):
+                        if new_board[i] == '0':
+                            game_sprites[i].kill()
+                        elif new_board[i] == '1':
+                            game_sprites[i].resurrect()
             else:
-                for i in range(len(new_board)):
-                    if new_board[i] == '0':
-                        game_sprites[i].kill()
-                    elif new_board[i] == '1':
-                        game_sprites[i].resurrect()
+                game_shape = gamefile.load_shape()
+                if not game_shape:
+                    pass
+                else:
+                    shape_select.read_shape_data(game_shape)
+                    game_state.is_shape_load = True
+
         return load_gameboard_clicked
 
     def step_generation_clicked():
-        if game_state.is_paused:
+        if game_state.is_paused and not game_state.is_shape_select:
             sprite_renderer.update(False, False, False)
             sprite_renderer.update(False, True, True)
         return step_generation_clicked
@@ -167,38 +195,102 @@ def main():
     game_ticks_fps = 120
 
     last_highlighted = Cell(0, 0, 0, 0)
+    shape_select = board.ShapeSelect()
     while True:
         # HANDLES THE INPUT
         for event in pygame.event.get():
             if event.type == QUIT:
                 sys.exit()
+
+            if event.type == KEYDOWN:
+                if pygame.key.get_mods() & KMOD_SHIFT and game_state.is_paused:
+                    game_state.is_shape_select = not game_state.is_shape_select
+                    if game_state.is_shape_load:
+                        game_state.is_shape_load = False
+                        shape_select.clear_loaded()
+                    if not game_state.is_shape_select:
+                        start.set_icon("glyphicons_173_play.png")
+                        start.set_label("Start")
+                        load_generation.set_label("Load")
+                        shape_select.clear_all()
+                        shape_select.highlight_selected(cols, game_sprites)
+                    else:
+                        start.set_icon("glyphicons_099_vector_path_all.png")
+                        start.set_label("Shpe")
+                        load_generation.set_label("Load Shape")
+                    for sprite in game_sprites:
+                        sprite.background_color = LIGHT_BLUE if game_state.is_shape_select else GREY
+
             if event.type == MOUSEBUTTONDOWN:
-                pressed = pygame.mouse.get_pressed()
+                mouse_left, mouse_middle, mouse_right = pressed = pygame.mouse.get_pressed()
                 mouse_loc = pygame.mouse.get_pos()
                 font_sprite_renderer.update(mouse_loc, pressed)
 
                 if game_state.is_paused:
-                    # If the game is paused and we hover over the game piece???
-                    for sprite in sprite_renderer.sprites():
-                        if collision_detection(sprite.get_rect(), mouse_loc):
-                            sprite.kill() if sprite.is_cell_alive() else sprite.resurrect()
+                    if mouse_middle == 1 and game_state.is_shape_load and game_state.is_shape_select:
+                        game_state.is_shape_load = False
+                        shape_select.clear_all()
+                        shape_select.highlight_selected(cols, game_sprites)
+
+                    if mouse_right == 1 and game_state.is_shape_select:
+                        #  Ugh - use a directed graph at some point stored based on direction (path finding much)
+                        for row in range(rows):
+                            for col in range(cols):
+                                # Put us in shape select mode
+                                if collision_detection(game_sprites[(cols * row) + col].get_rect(), mouse_loc):
+                                    pos = (row, col)
+                                    # Stores and clears coords for determining the shape dimensions
+                                    if shape_select.first == pos:
+                                        shape_select.clear_first()
+                                        shape_select.highlight_selected(cols, game_sprites)
+                                    elif shape_select.last == pos:
+                                        shape_select.clear_last()
+                                        shape_select.highlight_selected(cols, game_sprites)
+                                    elif shape_select.first == (-1, -1):
+                                        shape_select.first = pos
+                                        shape_select.highlight_selected(cols, game_sprites)
+                                    else:
+                                        # Allows the final point to be reset so the box can be easily re-sized
+                                        shape_select.last = pos
+                                        shape_select.highlight_selected(cols, game_sprites)
+
+                    if mouse_left == 1:
+                        if game_state.is_shape_select and game_state.is_shape_load:
+                            for row in range(rows):
+                                for col in range(cols):
+                                    if collision_detection(game_sprites[(cols * row) + col].get_rect(), mouse_loc):
+                                        shape_select.drop_shape(rows, cols, (col, row), game_sprites)
+                        elif not game_state.is_shape_load:
+                            # Resurrect / kill sprites on click!
+                            for sprite in sprite_renderer.sprites():
+                                if collision_detection(sprite.get_rect(), mouse_loc):
+                                    sprite.kill() if sprite.is_cell_alive() else sprite.resurrect()
+
                     sprite_renderer.update(True, False, True)
 
         mouse_loc = pygame.mouse.get_pos()
         font_sprite_renderer.update(mouse_loc, (0, 0, 0, 0))
         if game_state.is_paused:
-            # Check for any collisions
-
             hit_none = True
-            for sprite in sprite_renderer.sprites():
-                if collision_detection(sprite.get_rect(), mouse_loc):
-                    hit_none = False
-                    if not sprite == last_highlighted:
-                        last_highlighted.clear_highlight(True)
-                        last_highlighted = sprite
-                    sprite.highlight()
-                else:
-                    sprite.clear_highlight()
+            # Only clear this when we are in a drag/drop mode
+            if game_state.is_shape_load and game_state.is_shape_select:
+                for sprite in game_sprites:
+                    sprite.is_shape_selected = False
+            for row in range(rows):
+                for col in range(cols):
+                    # Put us in shape select mode
+                    index = (cols * row) + col
+                    if collision_detection(game_sprites[index].get_rect(), mouse_loc):
+                        if game_state.is_shape_load and game_state.is_shape_select:
+                            shape_select.drop_shape(rows, cols, (col, row), game_sprites, highlight=True)
+                        else:
+                            hit_none = False
+                            if not game_sprites[index] == last_highlighted:
+                                last_highlighted.clear_highlight(True)
+                                last_highlighted = game_sprites[index]
+                            game_sprites[index].highlight()
+                    else:
+                        game_sprites[index].clear_highlight()
             if hit_none:
                 last_highlighted.clear_highlight(True)
 
