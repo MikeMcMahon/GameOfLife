@@ -12,10 +12,12 @@ class ShapeSelect:
         self.last = (-1, -1)
         self.loaded = None
 
-    def clear_loaded(self):
-        self.loaded = None
-
     def read_shape_data(self, shape):
+        """
+        Reads in the shape data and stores the rows, cols, and shape information
+        @param shape:
+        @return:
+        """
         rows = 0
         cols = shape.find("!")
         for i in range(len(shape)):
@@ -24,6 +26,16 @@ class ShapeSelect:
         self.loaded = rows, cols, shape
 
     def drop_shape(self, rows, cols, pos, sprites, highlight=False):
+        """
+        Display on the gameboard the shape, by either killing/resurrecting the shape (on drop) or a simple highlight
+        with highlight=True
+        @param rows:  the rows in the grid
+        @param cols: the cols in the grid
+        @param pos: the position of the current sprite
+        @param sprites: the game sprites
+        @param highlight: show as a highlight or activate/deactivate the cell
+        @return:
+        """
         x, y = pos
 
         shape_rows, shape_cols, shape_data = self.loaded
@@ -48,6 +60,12 @@ class ShapeSelect:
                         sprites[index].resurrect()
 
     def highlight_selected(self, cols, sprites):
+        """
+        Tries to draw the border around the selected region
+        @param cols:
+        @param sprites:
+        @return:
+        """
         x1, y1 = self.first
         x2, y2 = self.last
 
@@ -85,6 +103,12 @@ class ShapeSelect:
                 sprites[(y * cols) + x].is_shape_selected = True
 
     def get_selected(self, cols, sprites):
+        """
+        get the sprites within the selected region
+        @param cols:
+        @param sprites:
+        @return:
+        """
         x1, y1 = self.first
         x2, y2 = self.last
 
@@ -107,12 +131,31 @@ class ShapeSelect:
         return dest_sprites, (max_x - min_x) + 1, (max_y - min_y) + 1
 
     def clear_first(self):
+        """
+        Clears the first clicked element when in select mode
+        @return:
+        """
         self.first = (-1, -1)
 
     def clear_last(self):
+        """
+        Clears the last clicked element when in select mode
+        @return:
+        """
         self.last = (-1, -1)
 
+    def clear_loaded(self):
+        """
+        Clears the loaded shape
+        @return:
+        """
+        self.loaded = None
+
     def clear_all(self):
+        """
+        Clears everything associated
+        @return:
+        """
         self.clear_first()
         self.clear_last()
         self.clear_loaded()
