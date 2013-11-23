@@ -96,7 +96,7 @@ def main():
     def clear_clicked():
         if game_state.is_paused:
             for sprite in sprite_renderer.sprites():
-                if game_state.is_shape_select:
+                if game_state.is_shape_select and not game_state.is_shape_load:
                     sprite.is_shape_selected = False
                     sprite.clear_highlight(True)
                     shape_select.clear()
@@ -227,6 +227,11 @@ def main():
                 font_sprite_renderer.update(mouse_loc, pressed)
 
                 if game_state.is_paused:
+                    if mouse_middle == 1 and game_state.is_shape_load and game_state.is_shape_select:
+                        game_state.is_shape_load = False
+                        shape_select.clear()
+                        shape_select.highlight_selected(cols, game_sprites)
+
                     if mouse_right == 1 and game_state.is_shape_select:
                         #  Ugh - use a directed graph at some point stored based on direction (path finding much)
                         for row in range(rows):

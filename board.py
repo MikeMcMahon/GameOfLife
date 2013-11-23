@@ -115,6 +115,7 @@ class ShapeSelect:
     def clear(self):
         self.clear_first()
         self.clear_last()
+        self.clear_loaded()
 
 
 class GameState:
