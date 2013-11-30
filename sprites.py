@@ -12,7 +12,6 @@ from pygame.sprite import Sprite
 import colors
 from physics import collision_detection
 
-import pygame
 import font
 from colors import *
 
@@ -48,8 +47,8 @@ class Cell(GameBase):
         self.background_color = GREY
         self.alive_color = GREY
         self.dead_color = WHITE
-        self.highlight_color = RED
-        self.neighbor_highlight = YELLOW
+        self.highlight_color = LIGHT_RED
+        self.neighbor_highlight = LIGHT_BLUE
         self.shape_select_color = PURPLE
         self.is_neighbor_highlighted = False
         self.cell_alive = False
@@ -183,9 +182,9 @@ class Cell(GameBase):
             self.image.fill(self.dead_color, (1, 1, 8, 8))
 
         # Applied after main color to create an "overlay" effect
-        mode = BLEND_RGBA_MULT if not self.cell_alive else BLEND_RGBA_MAX
+        mode = BLEND_RGBA_MULT if not self.cell_alive else BLEND_RGB_MULT
         if self.is_highlighted:
-            self.image.fill(self.highlight_color, (1, 1, 8, 8), mode)
+            self.image.fill(self.highlight_color, (1, 1, 8, 8))
         elif self.is_neighbor_highlighted:
             self.image.fill(self.neighbor_highlight, (1, 1, 8, 8), mode)
 
